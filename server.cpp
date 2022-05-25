@@ -20,7 +20,8 @@ using namespace std;
 
 // Default values if none are given
 int xSeats = 5;
-int ySeats = 5; 
+int ySeats = 8; 
+int s[] = {xSeats,ySeats};
 int ** ticketArray;
 int connfd,listenfd;
 char sendBuff[BUFFER_SIZE];
@@ -28,9 +29,9 @@ char sendBuff[BUFFER_SIZE];
 /* A method responsible for selling the requested ticket provided in the
 char array 'coord'*/
 
-bool sellTicket(char* coord){
-    int x = coord[0] - '0'; // Char to int conversion
-    int y = coord[2] - '0'; // Char to int conversion
+bool sellTicket(int* coord){
+    int x = coord[0]; // Char to int conversion
+    int y = coord[1]; // Char to int conversion
     if (x > (xSeats-1) || y > (ySeats-1)){ // Check if ticket selection is out of bounds
         printf("%s", "Ticket out of range");
         return false; // Indicate that the sale failed
@@ -98,7 +99,7 @@ void servant(){
     
         //return (void *)0;
 }
-
+int cord[2];
 int main(int argc, char *argv[]){
 
     // If dimensions were passed in
@@ -139,9 +140,10 @@ int main(int argc, char *argv[]){
     // Listen
     listen(listenfd, 10);
     char xdim,ydim;
-    xdim = xSeats;
-    ydim = ySeats;
-    char dims[3] = {xdim,',',ydim};
+    xdim = (char)xSeats;
+    ydim = (char)ySeats;
+    char dims[] = {xdim,',',ydim};
+
     while(1)
         {   
             checkDone();
@@ -160,8 +162,9 @@ int main(int argc, char *argv[]){
             that will indicate what seats the client is interested in*/
 
             if (strcmp(sendBuff,"PURCHASE ORDER") == 0){
-                read(connfd, sendBuff, sizeof(sendBuff));
-                if (sellTicket(sendBuff)){
+                read(connfd, cord, sizeof(cord));
+                cout << cord[0]<<endl;
+                if (sellTicket(cord)){
                     // Send a message to confirm the purchase was succesful 
                     sprintf(sendBuff, "Succesfully purchased tickets");
                     write(connfd,sendBuff,sizeof(sendBuff));
@@ -177,24 +180,20 @@ int main(int argc, char *argv[]){
                         exit(0);
                     }
                 } 
-            } else if (strcmp(sendBuff,"DIM") == 0){
-                
-                sprintf(sendBuff,"%s",dims);
-                cout << "SENDBUFF: "<< sendBuff<<endl;
-                write(connfd,sendBuff,sizeof(sendBuff));
             } else if (strcmp(sendBuff,"DIMX") == 0){
-                sprintf(sendBuff, "%d" ,ySeats);
-                write(connfd,sendBuff,sizeof(sendBuff));
-            }
                 
+                
+                write(connfd,s, sizeof(s)-1);
+                sleep(1);
+                
+              
+            }            
+              }
 
             //sprintf(sendBuff,"%d",0); // place the formatted time and additoinal info in buffer
             //write(connfd, sendBuff, strlen(sendBuff)); //  Write the buffer across the connection
         
-            sleep(1); // Wait 1 second to avoid sending 2(?)
-            close(connfd); // Close connection
         }
         
     // While connected
      
-}
