@@ -94,11 +94,7 @@ bool checkDone(){
         return false;
 }
 
-// Multithreaded solution to server multiple clients at the same time
-void servant(){
-    
-        //return (void *)0;
-}
+
 int cord[2];
 int main(int argc, char *argv[]){
 
@@ -163,7 +159,7 @@ int main(int argc, char *argv[]){
 
             if (strcmp(sendBuff,"PURCHASE ORDER") == 0){
                 read(connfd, cord, sizeof(cord));
-                cout << cord[0]<<endl;
+                cout << endl << "Selling :" << cord[0] << "," << cord[1] <<endl;
                 if (sellTicket(cord)){
                     // Send a message to confirm the purchase was succesful 
                     sprintf(sendBuff, "Succesfully purchased tickets");
@@ -181,19 +177,20 @@ int main(int argc, char *argv[]){
                     }
                 } 
             } else if (strcmp(sendBuff,"DIMX") == 0){
-                
-                
+                int toBuy[2];
+                memset(toBuy,0,sizeof(toBuy));
                 write(connfd,s, sizeof(s)-1);
-                sleep(1);
-                
-              
-            }            
-              }
-
-            //sprintf(sendBuff,"%d",0); // place the formatted time and additoinal info in buffer
-            //write(connfd, sendBuff, strlen(sendBuff)); //  Write the buffer across the connection
-        
+                sleep(2);
+                read(connfd,sendBuff,sizeof(sendBuff)-1); // Reads PURCHASE ORDER
+                read(connfd,toBuy,8); // Im unsure why this was neccesary 
+                read(connfd,toBuy,8);
+                sellTicket(toBuy);
+                sleep(3);
+                sprintf(sendBuff, "this");
+                write(connfd, sendBuff,sizeof(sendBuff)-1);
+            }   
         }
+      }
         
     // While connected
      

@@ -99,11 +99,11 @@ void askDimension(){
     // Request X Dimension
     sprintf(messBuff,"DIMX");
     write(sockfd,messBuff,sizeof(messBuff)-1);
-    sleep(1);
+    sleep(2);
     read(sockfd, cord, 8);
     xSeat = cord[0];
     ySeat = cord[1];
-    cout << cord[0];
+    cout << xSeat;
 }
 
 /* General purpose menu function responsible for handling
@@ -113,19 +113,24 @@ void menu(char* mode){
 
 
     if (strcmp(mode, "automatic") == 0){
-        if (ySeat < 1 || xSeat < 1)
+        int toBuy[2];
+        if (ySeat < 1 || xSeat < 1){
             askDimension(); // sets xSeat and ySeat
-        
-        //cout << xCoord;
-        //cout << yCoord;
-        //char yC = yCoord;
-        srand(time(NULL)); // Set random seed
+            srand(time(NULL)); // Set random seed
 
-        cord[0] = rand() % (xSeat-1);
-        cord[1] = rand() % (ySeat-1);
-        cout << "Cord 0: " << cord[0]<<endl;
-        cout << "Cord 1: " << cord[1]<<endl;
-        purchaseOrder(cord);
+            toBuy[0] = rand() % (xSeat);
+            toBuy[1] = rand() % (ySeat);
+            cout << "Cord 0: " << toBuy[0]<<endl;
+            cout << "Cord 1: " << toBuy[1]<<endl;
+
+            purchaseOrder(toBuy);
+        }
+        else{
+            toBuy[0] = rand() % (xSeat);
+            toBuy[1] = rand() % (ySeat);
+            purchaseOrder(toBuy);
+        }
+            
     } else if (strcmp(mode, "manual")==0){ // Fully functional DONT TOUCH
         cout << "Ticket X Position: ";
         cin  >> cord[0]; // input for x
@@ -150,8 +155,8 @@ void purchaseOrder(int* coord){
     // Load desired ticket position
     // Send delisten(listenfd, 10);sired position to server
     write(sockfd,coord, 8);
-    sleep(5);
     //cout << "output: "<< listenReply(10) <<endl;
+    cout << "READING" <<endl;
     n = read(sockfd, messBuff, sizeof(messBuff)-1);
     if (strcmp(messBuff,"SOLD OUT!") == 0){
         incomplete = false;
