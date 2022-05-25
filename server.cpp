@@ -180,13 +180,10 @@ int main(int argc, char *argv[]){
                 int toBuy[2];
                 memset(toBuy,0,sizeof(toBuy));
                 write(connfd,s, sizeof(s)-1);
-                sleep(2);
                 read(connfd,sendBuff,sizeof(sendBuff)-1); // Reads PURCHASE ORDER
                 read(connfd,toBuy,8); // Im unsure why this was neccesary 
                 read(connfd,toBuy,8);
                 sellTicket(toBuy);
-                sleep(3);
-                sprintf(sendBuff, "this");
                 write(connfd, sendBuff,sizeof(sendBuff)-1);
             }   
         }

@@ -99,7 +99,6 @@ void askDimension(){
     // Request X Dimension
     sprintf(messBuff,"DIMX");
     write(sockfd,messBuff,sizeof(messBuff)-1);
-    sleep(2);
     read(sockfd, cord, 8);
     xSeat = cord[0];
     ySeat = cord[1];
@@ -120,8 +119,6 @@ void menu(char* mode){
 
             toBuy[0] = rand() % (xSeat);
             toBuy[1] = rand() % (ySeat);
-            cout << "Cord 0: " << toBuy[0]<<endl;
-            cout << "Cord 1: " << toBuy[1]<<endl;
 
             purchaseOrder(toBuy);
         }
@@ -151,13 +148,12 @@ void purchaseOrder(int* coord){
     sprintf(messBuff,"PURCHASE ORDER");
     // Write intial command across socket
     write(sockfd,messBuff, sizeof(messBuff));
-    sleep(2);
     // Load desired ticket position
     // Send delisten(listenfd, 10);sired position to server
     write(sockfd,coord, 8);
     //cout << "output: "<< listenReply(10) <<endl;
-    cout << "READING" <<endl;
     n = read(sockfd, messBuff, sizeof(messBuff)-1);
+    cout << messBuff<<endl;
     if (strcmp(messBuff,"SOLD OUT!") == 0){
         incomplete = false;
     } else{
@@ -232,7 +228,7 @@ int main(int argc, char* argv[]){
         return 1;
         } 
             menu(mode);
-            
+            sleep(1); // So the other clients have a chance
         }
         
     cout << "Out of tickets."<<endl;
