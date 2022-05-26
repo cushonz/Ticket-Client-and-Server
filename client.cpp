@@ -14,6 +14,12 @@
 #include <iostream>
 using namespace std;
 
+/* Projessor Vajda! I just wanted to leave this comment to say thank you for your help with this
+lab as well as your general willingness to help and answer students questions. */
+
+
+// The only thing I believe I left out from the instructions was the timeout.
+
 // Function prototypes
 void listenReply(int seconds);
 void menu();
@@ -26,7 +32,7 @@ void purchaseOrder(int* coord);
 
 char messBuff[BUFFER_SIZE];
 
-// Varibales to be read from setting.ini
+// Variables to be read from setting.ini
 char* IP; 
 int port;
 int timeout;
@@ -43,7 +49,7 @@ int ySeat = -1;
 char * mode;
 
 //Connection file for reading IP, Port, and timeout.
-string settingFile = "connection.ini";
+string settingFile;
 
 
 // Helper function used in retriveSettings(), respomsible for validating the length of the connection file.
@@ -71,21 +77,21 @@ void retriveSettings(string settingFile){
     if (validateFile){
              int length = 0;
             string line;
-            string x[3];
+            string settingArr[3]; //Setting string arr
             ifstream myfile ("connection.ini");
             if (myfile.is_open())
             {
                 getline(myfile,line); // skip first line[connection]
                 getline(myfile,line); // Grab IP line
-                x[0] = line.substr(5,13); // Strip IP = 
+                settingArr[0] = line.substr(5,13); // Strip IP = 
                 getline(myfile,line); // Grab Port
-                x[1] = line.substr(7,11); // Strip port = 
+                settingArr[1] = line.substr(7,11); // Strip port = 
                 getline(myfile,line); // Grab timeout
-                x[2] = line.substr(10,12);
+                settingArr[2] = line.substr(10,12);
                 
-                IP = (char*)x[0].c_str();
-                port = stoi(x[1]);
-                timeout = stoi(x[2]);
+                IP = (char*)settingArr[0].c_str();
+                port = stoi(settingArr[1]);
+                timeout = stoi(settingArr[2]);
             }
                 myfile.close();
     } else
@@ -102,7 +108,6 @@ void askDimension(){
     read(sockfd, cord, 8);
     xSeat = cord[0];
     ySeat = cord[1];
-    cout << xSeat;
 }
 
 /* General purpose menu function responsible for handling
@@ -117,8 +122,8 @@ void menu(char* mode){
             askDimension(); // sets xSeat and ySeat
             srand(time(NULL)); // Set random seed
 
-            toBuy[0] = rand() % (xSeat);
-            toBuy[1] = rand() % (ySeat);
+            toBuy[0] = rand() % (xSeat) + 1;
+            toBuy[1] = rand() % (ySeat) + 1;
 
             purchaseOrder(toBuy);
         }
@@ -133,7 +138,10 @@ void menu(char* mode){
         cin  >> cord[0]; // input for x
         cout << "Ticket Y position: ";
         cin >> cord[1]; // input for y
-        purchaseOrder(cord); // Attempt to purchase the designated ticket
+        if (cord[0] > -1 && cord[1] > -1)
+            purchaseOrder(cord); // Attempt to purchase the designated ticket
+        else 
+            cout << "Bad input! Try"<endl;
         
     }
 }
@@ -183,7 +191,7 @@ int main(int argc, char* argv[]){
 
     incomplete = true;
 
-
+    // Make sure the user is following the correct format
     if (argc < 2){
         cout << "Usage: " << argv[0] << " ";
         cout << "<mode> <settingsFile.ini>"<<endl; 
@@ -222,13 +230,15 @@ int main(int argc, char* argv[]){
             return 1;
         } 
 
+        
         if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) // lastly connect and error catch 
         {
         printf("\n Error : Connect Failed \n");
         return 1;
         } 
+            int sleepTime = rand() % 7+1;
             menu(mode);
-            sleep(1); // So the other clients have a chance
+            sleep(sleepTime); // Random sleep time as per instructions
         }
         
     cout << "Out of tickets."<<endl;

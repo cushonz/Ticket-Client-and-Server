@@ -1,3 +1,6 @@
+// In order to prevent clearing you can comment out lines 
+// 148 and 184
+
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -32,17 +35,21 @@ char array 'coord'*/
 bool sellTicket(int* coord){
     int x = coord[0]; // Char to int conversion
     int y = coord[1]; // Char to int conversion
-    if (x > (xSeats-1) || y > (ySeats-1)){ // Check if ticket selection is out of bounds
-        printf("%s", "Ticket out of range");
-        return false; // Indicate that the sale failed
-    }
-        else {
-            if (ticketArray[x][y] == 1) {// If ticket is available
-                ticketArray[x][y] = 0; // Sell ticket and set to unavailable
-                return true; // Indicate that the ticket was succesfully sold
-            } else 
-                return false; // Indicate that the sale failed
+    if ((x >= 0 && x<=xSeats-1) && (y >= 0 && ySeats-1)){
+        if (x > (xSeats-1) || y > (ySeats-1)){ // Check if ticket selection is out of bounds
+            printf("%s", "Ticket out of range");
+            return false; // Indicate that the sale failed
         }
+            else {
+                if (ticketArray[x][y] == 1) {// If ticket is available
+                    ticketArray[x][y] = 0; // Sell ticket and set to unavailable
+                    return true; // Indicate that the ticket was succesfully sold
+                } else 
+                    return false; // Indicate that the sale failed
+        }
+    } else {
+        return false;
+    }
 }
 
 
@@ -97,7 +104,6 @@ bool checkDone(){
 
 int cord[2];
 int main(int argc, char *argv[]){
-
     // If dimensions were passed in
     if (argc >= 3){
         // Get X dimension from sys line
@@ -108,8 +114,6 @@ int main(int argc, char *argv[]){
 
     // Allocate memory for the ticketArray and populate with 1's
     ticketArray = genMatrix();
-
-    cout << endl; // space
     
     // Random seed
     srand(time(NULL));
@@ -142,6 +146,7 @@ int main(int argc, char *argv[]){
 
     while(1)
         {   
+            system("clear");
             checkDone();
             // Display available tickets
             printMatrix(ticketArray);   
@@ -177,17 +182,15 @@ int main(int argc, char *argv[]){
                     }
                 } 
             } else if (strcmp(sendBuff,"DIMX") == 0){
+                system("clear");
                 int toBuy[2];
                 memset(toBuy,0,sizeof(toBuy));
                 write(connfd,s, sizeof(s)-1);
                 read(connfd,sendBuff,sizeof(sendBuff)-1); // Reads PURCHASE ORDER
-                read(connfd,toBuy,8); // Im unsure why this was neccesary 
+                read(connfd,toBuy,8); // Read un needed message from client for manual mode
                 read(connfd,toBuy,8);
                 sellTicket(toBuy);
                 write(connfd, sendBuff,sizeof(sendBuff)-1);
             }   
         }
-      }
-        
-    // While connected
-     
+      }     
